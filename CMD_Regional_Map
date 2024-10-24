@@ -1,0 +1,138 @@
+SELECT 
+  *,
+  metrics_cost_micros / 1000000 AS metrics_cost_dollars, -- Convert micros to dollars
+  CASE
+    -- State-specific rules for partners
+    WHEN State = 'Idaho' THEN 'Jay (Seattle)'
+    WHEN State = 'Washington' THEN 'Jay (Seattle)'
+    WHEN State = 'Missouri' THEN 'Marki (Utah)'
+    WHEN State = 'Utah' THEN 'Marki (Utah)'
+    WHEN State = 'Wyoming' THEN 'Marki (Utah)'
+    WHEN State = 'District of Columbia' THEN 'Mary (Miami)'
+    WHEN State = 'Florida' THEN 'Mary (Miami)'
+    WHEN State = 'Georgia' THEN 'Mary (Miami)'
+    WHEN State = 'Maryland' THEN 'Mary (Miami)'
+    WHEN State = 'North Carolina' THEN 'Mary (Miami)'
+    WHEN State = 'Michigan' THEN 'Michigan Partner'
+    WHEN State = 'Kentucky' THEN 'Ohio Partner'
+    WHEN State = 'Ohio' THEN 'Ohio Partner'
+    WHEN State = 'New York' THEN 'Stephan (New York)'
+    WHEN State = 'Illinois' THEN 'Amanda (Chicago)'
+    WHEN State = 'Wisconsin' Then 'Amanda (Chicago)'
+    WHEN State = 'Indiana' Then 'Amanda (Chicago)'
+   WHEN State = 'Minnesota' Then 'Amanda (Chicago)'
+      WHEN State = 'Rhode Island' Then 'Amanda (Chicago)'
+      WHEN State = 'Arizona' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+
+    -- City-level exceptions for Drip Hydration partners
+    WHEN City = 'Pittsburgh' AND State = 'Ohio' THEN 'Ohio Partner'
+    WHEN City = 'Adelanto' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Apple Valley' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Banning' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Barstow' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Beaumont' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Big Bear' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Big Bear Lake' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Bloomington' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Blythe' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Cabazon' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Calimesa' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Canyon Lake' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Cathedral City' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Chino' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Chino Hills' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Coachella' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Corona' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Crestline' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Desert Hot Springs' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Eastvale' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Fontana' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Fort Irwin' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Grand Terrace' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Helendale' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Hemet' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Hesperia' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Highland' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Homeland' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Idyllwild-Pine Cove' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Indio' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Joshua Tree' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'La Quinta' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Lake Arrowhead' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Lake Elsinore' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Loma Linda' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Menifee' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Mentone' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Montclair' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Moreno Valley' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Murrieta' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Needles' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Norco' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Nuevo' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Ontario' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Palm Desert' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Palm Springs' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Perris' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Phelan' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Rancho Cucamonga' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Rancho Mirage' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Redlands' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Rialto' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Riverside' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'San Bernardino' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'San Jacinto' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Sun City' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Temecula' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Thermal' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Thousand Palms' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Twentynine Palms' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Upland' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Valle Vista' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Victorville' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Wildomar' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Winchester' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Woodcrest' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Wrightwood' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Yermo' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Yucaipa' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Yucca Valley' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+    WHEN City = 'Phoenix' THEN 'Anabelle (Palm Springs, Inland Empire & Arizona)'
+
+    -- Stephan (New York) cities
+    WHEN City = 'Grand Terrace' THEN 'Stephan (New York)'
+    WHEN City = 'Helendale' THEN 'Stephan (New York)'
+    WHEN City = 'Hemet' THEN 'Stephan (New York)'
+    WHEN City = 'Hesperia' THEN 'Stephan (New York)'
+    WHEN City = 'Highland' THEN 'Stephan (New York)'
+    WHEN City = 'Homeland' THEN 'Stephan (New York)'
+    WHEN City = 'Idyllwild-Pine Cove' THEN 'Stephan (New York)'
+
+-- Assign all U.S. locations that are not covered by the above rules to HQ
+WHEN (Country = 'United States' OR Country IN ('Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 
+      'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 
+      'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 
+      'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 
+      'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 
+      'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'))
+AND NOT (
+  State IN ('Idaho', 'Washington', 'Missouri', 'Utah', 'Wyoming', 'District of Columbia', 'Florida', 'Georgia', 'Maryland', 
+            'North Carolina', 'Michigan', 'Kentucky', 'Ohio')
+  OR City IN ('Pittsburgh', 'Adelanto', 'Apple Valley', 'Banning', 'Barstow', 'Beaumont', 'Big Bear', 'Big Bear Lake', 'Bloomington', 
+              'Blythe', 'Cabazon', 'Calimesa', 'Canyon Lake', 'Cathedral City', 'Chino', 'Chino Hills', 'Coachella', 'Corona', 
+              'Crestline', 'Desert Hot Springs', 'Eastvale', 'Fontana', 'Fort Irwin', 'Grand Terrace', 'Helendale', 'Hemet', 
+              'Hesperia', 'Highland', 'Homeland', 'Idyllwild-Pine Cove', 'Indio', 'Joshua Tree', 'La Quinta', 'Lake Arrowhead', 
+              'Lake Elsinore', 'Loma Linda', 'Menifee', 'Mentone', 'Montclair', 'Moreno Valley', 'Murrieta', 'Needles', 'Norco', 
+              'Nuevo', 'Ontario', 'Palm Desert', 'Palm Springs', 'Perris', 'Phelan', 'Rancho Cucamonga', 'Rancho Mirage', 
+              'Redlands', 'Rialto', 'Riverside', 'San Bernardino', 'San Jacinto', 'Sun City', 'Temecula', 'Thermal', 
+              'Thousand Palms', 'Twentynine Palms', 'Upland', 'Valle Vista', 'Victorville', 'Wildomar', 'Winchester', 
+              'Woodcrest', 'Wrightwood', 'Yermo', 'Yucaipa', 'Yucca Valley')
+)
+THEN 'HQ'
+
+-- Assign all non-U.S. locations to International
+ELSE 'International'
+END AS Partner_Designation
+FROM 
+  `trusty-hangar-396923.views.GadsmappedDripAll`;
+
+

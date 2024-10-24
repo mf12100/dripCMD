@@ -1,0 +1,376 @@
+SELECT
+  'Drip Hydration' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration.charges`
+
+UNION ALL
+
+-- Drip Hydration Arizona
+SELECT
+  'Drip Hydration Arizona' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__ariziona.charges`
+
+UNION ALL
+
+-- Drip Hydration Atlanta
+SELECT
+  'Drip Hydration Atlanta' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__atlanta.charges`
+
+UNION ALL
+
+-- Drip Hydration Austin
+SELECT
+  'Drip Hydration Austin' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__austin.charges`
+
+UNION ALL
+
+-- Drip Hydration Baltimore
+SELECT
+  'Drip Hydration Baltimore' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__baltimore.charges`
+
+UNION ALL
+
+-- Drip Hydration Colorado
+SELECT
+  'Drip Hydration Colorado' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__colorado.charges`
+
+UNION ALL
+
+-- Drip Hydration Connecticut
+SELECT
+  'Drip Hydration Connecticut' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__connecticut.charges`
+
+UNION ALL
+
+-- Drip Hydration Dallas
+SELECT
+  'Drip Hydration Dallas' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__dallas.charges`
+
+UNION ALL
+
+-- Drip Hydration Hawaii
+SELECT
+  'Drip Hydration Hawaii' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__hawaii.charges`
+
+UNION ALL
+
+-- Drip Hydration Houston
+SELECT
+  'Drip Hydration Houston' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__houston.charges`
+
+UNION ALL
+
+-- Drip Hydration Illinois
+SELECT
+  'Drip Hydration Illinois' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__illinois.charges`
+
+UNION ALL
+
+-- Drip Hydration Inland Empire
+SELECT
+  'Drip Hydration Inland Empire' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__inland_empire.charges`
+
+UNION ALL
+
+-- Drip Hydration Kentucky
+SELECT
+  'Drip Hydration Kentucky' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__kentucky.charges`
+
+UNION ALL
+
+-- Drip Hydration Las Vegas
+SELECT
+  'Drip Hydration Las Vegas' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__las_vegas.charges`
+
+UNION ALL
+
+-- Drip Hydration Miami
+SELECT
+  'Drip Hydration Miami' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__miami.charges`
+
+UNION ALL
+
+-- Drip Hydration Michigan
+SELECT
+  'Drip Hydration Michigan' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__michigan.charges`
+
+UNION ALL
+
+-- Drip Hydration Minnesota
+SELECT
+  'Drip Hydration Minnesota' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__minnesota.charges`
+
+UNION ALL
+
+-- Drip Hydration Missouri
+SELECT
+  'Drip Hydration Missouri' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__missouri.charges`
+
+UNION ALL
+
+-- Drip Hydration New Jersey
+SELECT
+  'Drip Hydration New Jersey' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__new_jersey_.charges`
+
+UNION ALL
+
+-- Drip Hydration New Mexico
+SELECT
+  'Drip Hydration New Mexico' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__new_mexico.charges`
+
+UNION ALL
+
+-- Drip Hydration New Orleans
+SELECT
+  'Drip Hydration New Orleans' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__new_orleans.charges`
+
+UNION ALL
+
+-- Drip Hydration New York
+SELECT
+  'Drip Hydration New York' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__new_york.charges`
+
+UNION ALL
+
+-- Drip Hydration Ohio
+SELECT
+  'Drip Hydration Ohio' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__ohio.charges`
+
+UNION ALL
+
+-- Drip Hydration Oklahoma
+SELECT
+  'Drip Hydration Oklahoma' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__oklahoma.charges`
+
+UNION ALL
+
+-- Drip Hydration Philadelphia
+SELECT
+  'Drip Hydration Philadelphia' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__philadelphia.charges`
+
+UNION ALL
+
+-- Drip Hydration Phoenix
+SELECT
+  'Drip Hydration Phoenix' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__phoenix.charges`
+
+UNION ALL
+
+-- Drip Hydration Pittsburgh
+SELECT
+  'Drip Hydration Pittsburgh' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__pittsburgh.charges`
+
+UNION ALL
+
+-- Drip Hydration Portland
+SELECT
+  'Drip Hydration Portland' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__portland.charges`
+
+UNION ALL
+
+-- Drip Hydration Raleigh
+SELECT
+  'Drip Hydration Raleigh' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__raleigh.charges`
+
+UNION ALL
+
+-- Drip Hydration Seattle
+SELECT
+  'Drip Hydration Seattle' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__seattle.charges`
+
+UNION ALL
+
+-- Drip Hydration Tennessee
+SELECT
+  'Drip Hydration Tennessee' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__tennessee.charges`
+
+UNION ALL
+
+-- Drip Hydration UK
+SELECT
+  'Drip Hydration UK' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__uk.charges`
+
+UNION ALL
+
+-- Drip Hydration Utah
+SELECT
+  'Drip Hydration Utah' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__utah.charges`
+
+UNION ALL
+
+-- Drip Hydration Virginia
+SELECT
+  'Drip Hydration Virginia' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__virginia.charges`
+
+UNION ALL
+
+-- Drip Hydration Washington DC
+SELECT
+  'Drip Hydration Washington DC' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__washington_dc.charges`
+
+UNION ALL
+
+-- Drip Hydration Wisconsin
+SELECT
+  'Drip Hydration Wisconsin' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.drip_hydration__wisconsin.charges`
+
+UNION ALL
+
+-- Mobile Medical
+SELECT
+  'Mobile Medical' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM `trusty-hangar-396923.mobile_medical_parent.charges`
+
+UNION ALL
+
+-- Concierge MD LA
+SELECT
+  'Concierge MD LA' AS location,
+  id,  -- Assuming 'id' field exists
+  payment_intent,
+  CAST(amount_refunded AS FLOAT64) / 100 AS amount_refunded
+FROM trusty-hangar-396923.concierge_md_la.charges

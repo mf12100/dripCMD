@@ -1,0 +1,188 @@
+WITH unified_square_data AS (
+  SELECT 
+    CASE 
+      WHEN line_item.value.name IS NULL THEN 'Vitamin IV'  -- Assign "Vitamin IV" to NULL names
+      WHEN LOWER(line_item.value.name) LIKE '%iv%' 
+           OR line_item.value.name IN ('1L Normal Saline', 'Hangover IV', 'Recovery IV', 'Vitamin IV', 'Myers Cocktail IV', 'Immune Boost IV') 
+        THEN 'Vitamin IV'
+      ELSE line_item.value.name
+    END AS service,
+    ROUND(SUM(line_item.value.total_money.amount) / 100, 2) AS revenue,
+    DATE(updated_at) AS date,
+    COUNT(updated_at) AS NumberOfOrders,
+    IFNULL(returns.value.source_order_id, line_item.value.uid) AS source_order_id,  -- Use fallback to line_item.uid if no return ID is present
+    "Drip" AS final_source  -- Attribute everything to "Drip"
+  FROM 
+    `trusty-hangar-396923.square_seattle.orders`, 
+    UNNEST(line_items) AS line_item
+    LEFT JOIN UNNEST(returns) AS returns  -- Left join in case returns are missing
+  GROUP BY 
+    service, DATE(updated_at), source_order_id
+
+  UNION ALL
+
+  SELECT 
+    CASE 
+      WHEN LOWER(line_item.value.name) LIKE '%iv%' 
+           OR line_item.value.name IN ('1L Normal Saline', 'Hangover IV', 'Recovery IV', 'Vitamin IV', 'Myers Cocktail IV', 'Immune Boost IV') 
+        THEN 'Vitamin IV'
+      ELSE line_item.value.name
+    END AS service,
+    ROUND(SUM(line_item.value.total_money.amount) / 100, 2) AS revenue,
+    DATE(updated_at) AS date,
+    COUNT(updated_at) AS NumberOfOrders,
+    IFNULL(returns.value.source_order_id, line_item.value.uid) AS source_order_id,
+    "Drip" AS final_source
+  FROM 
+    `trusty-hangar-396923.square_baltimore.orders`, 
+    UNNEST(line_items) AS line_item
+    LEFT JOIN UNNEST(returns) AS returns
+  GROUP BY 
+    service, DATE(updated_at), source_order_id
+
+  -- (Additional UNIONS for other Square locations...)
+),
+
+final_square_data AS (
+  SELECT 
+    sq.date,
+    CASE
+      -- Apply filters for data after June 30, 2024
+      -- Drip Membership
+      WHEN LOWER(sq.service) LIKE '%basic%' 
+        OR LOWER(sq.service) LIKE '%premium%' 
+        OR LOWER(sq.service) LIKE '%platinum%' 
+        OR LOWER(sq.service) LIKE '%elite%' THEN 'Drip Membership'
+      -- Hair Loss Treatment
+      WHEN LOWER(sq.service) LIKE '%hair loss%' THEN 'Hair Loss Treatment'
+      -- Weight Loss
+      WHEN LOWER(sq.service) LIKE '%weight%' 
+        OR LOWER(sq.service) LIKE '%fat%' 
+        OR LOWER(sq.service) LIKE '%lipostat%' THEN 'Weight Loss'
+      -- CMD Membership
+      WHEN LOWER(sq.service) LIKE '%cmd%' 
+        OR LOWER(sq.service) LIKE '%concierge%' THEN 'CMD Membership'
+      -- Executive Physicals
+      WHEN LOWER(sq.service) LIKE '%executive%' THEN 'Executive Physicals'
+      -- Ketamine IV
+      WHEN LOWER(sq.service) LIKE '%ketamine%' 
+        OR LOWER(sq.service) LIKE '%mental health iv%' 
+        OR LOWER(sq.service) LIKE '%specialty%' THEN 'IV Therapy'
+      -- Peptides filter
+      WHEN LOWER(sq.service) LIKE '%sermorelin injections%' 
+        OR LOWER(sq.service) LIKE '%sermorelin nasal spray%' 
+        OR LOWER(sq.service) LIKE '%cjc-1295/ipamorelin%' 
+        OR LOWER(sq.service) LIKE '%ghk-cu - skin rejuvenation & anti-aging%' 
+        OR LOWER(sq.service) LIKE '%ghk-cu - topical cream%' 
+        OR LOWER(sq.service) LIKE '%bpc 157 - muscle tissue & joint recovery%' 
+        OR LOWER(sq.service) LIKE '%dsip – sleep & stress regulator%' 
+        OR LOWER(sq.service) LIKE '%pt-141 - sexual enhancement%' 
+        OR LOWER(sq.service) LIKE '%pt-141 - nasal spray%' 
+        OR LOWER(sq.service) LIKE '%bpc capsules%' 
+        OR LOWER(sq.service) LIKE '%selank injections%' 
+        OR LOWER(sq.service) LIKE '%selank nasal spray%' 
+        OR LOWER(sq.service) LIKE '%semax injections%' 
+        OR LOWER(sq.service) LIKE '%semax nasal spray%' 
+        OR LOWER(sq.service) LIKE '%thymosin alpha 1%' 
+        OR LOWER(sq.service) LIKE '%aod%' 
+        OR LOWER(sq.service) LIKE '%sermorelin%' 
+        OR LOWER(sq.service) LIKE '%sermorelin spray%' 
+        OR LOWER(sq.service) LIKE '%cjc%' 
+        OR LOWER(sq.service) LIKE '%ghk-cu%' 
+        OR LOWER(sq.service) LIKE '%ghk-cu cream%' 
+        OR LOWER(sq.service) LIKE '%bpc157%' 
+        OR LOWER(sq.service) LIKE '%dsip injections%' 
+        OR LOWER(sq.service) LIKE '%pt-141 injections%' 
+        OR LOWER(sq.service) LIKE '%pt-141 spray%' 
+        OR LOWER(sq.service) LIKE '%bpc pills%' 
+        OR LOWER(sq.service) LIKE '%selank%' 
+        OR LOWER(sq.service) LIKE '%selank spray%' 
+        OR LOWER(sq.service) LIKE '%semax%' 
+        OR LOWER(sq.service) LIKE '%semax spray%' 
+        OR LOWER(sq.service) LIKE '%thymosin alpha%' 
+        OR LOWER(sq.service) LIKE '%topical ghk-cu%' 
+        OR LOWER(sq.service) LIKE '%bpc%' 
+        OR LOWER(sq.service) LIKE '%dsip%' 
+        OR LOWER(sq.service) LIKE '%pt-141%' 
+        OR LOWER(sq.service) LIKE '%bpc 157 oral capsules%' 
+        OR LOWER(sq.service) LIKE '%thymosin injections%' 
+        OR LOWER(sq.service) LIKE '%bpc-157 oral capsules%' 
+        OR LOWER(sq.service) LIKE '%thymosin alpha 1 - injections%' 
+        OR LOWER(sq.service) LIKE '%pinealon acetate%' 
+        OR LOWER(sq.service) LIKE '%pinealon%' 
+        OR LOWER(sq.service) LIKE '%thymosin beta%' 
+        OR LOWER(sq.service) LIKE '%thymosin beta 4%' 
+        OR LOWER(sq.service) LIKE '%aod 9064%' 
+        THEN 'Peptides'
+      -- IV Membership Plan
+      WHEN LOWER(sq.service) LIKE '%iv membership%' THEN 'IV Membership Plan'
+      -- Iron IV
+      WHEN LOWER(sq.service) LIKE '%iron%' THEN 'Iron IV'
+      -- Lab Testing
+      WHEN LOWER(sq.service) LIKE '%lab%' 
+        OR LOWER(sq.service) LIKE '%drug panel cup test%' THEN 'Lab Testing'
+      -- NAD Membership
+      WHEN LOWER(sq.service) LIKE '%nad%' 
+        AND LOWER(sq.service) LIKE '%membership%' THEN 'NAD IV'
+      -- NAD Injection
+      WHEN LOWER(sq.service) LIKE '%nad injection%' 
+        OR LOWER(sq.service) LIKE '%nad shot%' THEN 'NAD IV'
+      -- Monoclonal
+      WHEN LOWER(sq.service) LIKE '%monoclonal%' THEN 'Monoclonal'
+      -- NAD Nasal Spray
+      WHEN LOWER(sq.service) LIKE '%nad nasal spray%' THEN 'NAD Nasal Spray'
+      -- NAD IV (exclude Benadryl)
+      WHEN LOWER(sq.service) LIKE '%nad%' 
+        AND LOWER(sq.service) NOT LIKE '%benadryl%' THEN 'NAD IV'
+      -- Covid
+      WHEN LOWER(sq.service) LIKE '%covid%' 
+        OR LOWER(sq.service) LIKE '%antigen%' 
+        OR LOWER(sq.service) LIKE '%pcr%' THEN 'Covid'
+      -- Stem Cell IV
+      WHEN LOWER(sq.service) LIKE '%stem cell%' THEN 'Stem Cell IV'
+      -- TRT
+      WHEN LOWER(sq.service) LIKE '%trt%' 
+        OR LOWER(sq.service) LIKE '%enclomiphene%' THEN 'TRT'
+      -- Imaging (Other)
+      WHEN LOWER(sq.service) LIKE '%imaging%' 
+        OR LOWER(sq.service) LIKE '%x-ray%' 
+        OR LOWER(sq.service) LIKE '%diagnostic%' 
+        OR LOWER(sq.service) LIKE '%ultrasound%' THEN 'Other'
+      -- House Calls
+      WHEN LOWER(sq.service) LIKE '%house call%' THEN 'House Calls'
+      -- Corporate
+      WHEN LOWER(sq.service) LIKE '%corporate%' 
+        OR LOWER(sq.service) LIKE '%staffing fee%' 
+        OR LOWER(sq.service) LIKE '%vendor%' THEN 'Corporate'
+      -- IV Therapy-related categories
+      WHEN LOWER(sq.service) LIKE '%injection%' 
+        OR LOWER(sq.service) LIKE '%shot%' THEN 'IV Therapy'
+      WHEN LOWER(sq.service) LIKE '%benadryl%' THEN 'IV Therapy'
+      WHEN LOWER(sq.service) LIKE '%ondansetron%' 
+        OR LOWER(sq.service) LIKE '%zofran%' THEN 'IV Therapy'
+      WHEN LOWER(sq.service) LIKE '%stomach flu%' THEN 'IV Therapy'
+      WHEN LOWER(sq.service) LIKE '%manual amount%' 
+        OR LOWER(sq.service) LIKE '%custom amount%' THEN 'IV Therapy'
+      WHEN LOWER(sq.service) LIKE '%promethazine%' 
+        OR LOWER(sq.service) LIKE '%phenergan%' THEN 'IV Therapy'
+      WHEN LOWER(sq.service) LIKE '%service fee%' 
+        OR LOWER(sq.service) LIKE '%parking%' 
+        OR LOWER(sq.service) LIKE '%travel fee%' 
+        OR LOWER(sq.service) LIKE '%rescheduling fee%' THEN 'IV Therapy'
+      WHEN LOWER(sq.service) LIKE '%ozone%' THEN 'IV Therapy'
+      -- Default to IV Therapy
+      ELSE 'IV Therapy'
+    END AS category,
+    sq.final_source,
+    SUM(sq.revenue) AS total_revenue,
+    SUM(sq.NumberOfOrders) AS total_orders
+  FROM unified_square_data sq
+  GROUP BY 
+    sq.date, 
+    sq.final_source, 
+    sq.service
+)
+
+SELECT * 
+FROM final_square_data
+ORDER BY date DESC;

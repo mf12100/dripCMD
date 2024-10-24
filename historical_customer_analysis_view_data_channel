@@ -1,0 +1,355 @@
+/* Change log
+-- 22 Jan 2023 :: Ruby Mohindru   ::updated First_Order_Flag
+-- 17 March 2023 :: Ruby Mohindru :: replaced single account tables with all accounts tables, added hist data 
+-- 20 Mar 2023 :: Ruby Mohindru :: replaced invoice_items table
+-- 22 Mar 2023 :: Ruby Mohindru :: added remaining accounts
+-- 30 Mar 2023 :: Ruby Mohindru :: updated source
+-- 14 Apr 2023 :: Ruby Mohindru :: added square
+-- 18 Apr 2023 :: Ruby Mohindru :: added category (Corporate vs others)
+-- 19 Apr 2023 :: Ruby Mohindru :: updated service category, provider
+-- 03 May 2023 :: Pushpinder    :: updating view definition (stripe invoices -> payment intent)
+-- 15 May 2023 :: Ruby Mohindru :: added spends data
+-- 18 May 2023 :: Pushpinder    :: updated to using new combined stripe dataset
+-- 19 May 2023 :: Pushpinder    :: updated refund amt, travel fee and tip
+-- 29 May 2023 :: Pushpinder    :: updated dispute amt
+-- 07 June 2023 :: Ruby Mohindru :: removed tester emails
+-- 20 June 2023 :: Ruby Mohindru :: recalculating first order flag after union all
+-- Ruby Mohindru :: added service_category_final after Mike's mapping
+-- 13 July 2023 ::Ruby Mohindru :: removed tester email as requested by Mike (dina.chaevskaya.work@gmail.com)
+-- 07 Aug 2023 ::Ruby Mohindru :: removed tester email (novachromweb@gmail.com)
+-- 24 Aug 2023 :: Ruby Mohindru     :: Square - added data from remaining 3 accounts + removed service_category = supplies
+-- 06 Sep 2023 :: Ruby Mohindru     :: updated service_category_final logic for Stripe where scf <> 'Unmapped'
+-- 21 Sep 2023 :: Ruby Mohindru     :: updated service_category_final logic for Platform data
+-- 18 Oct 2023 :: Ruby Mohindru     :: added Square Portland data
+-- 1 Nov 2023 :: Ruby Mohindru     :: edited first_order_flag
+-- 30 Nov 2023 :: Ruby Mohindru     :: excluded Stripe Australia for now to be released next week
+-- 8 Dec 2023 :: Ruby Mohindru     :: added mapping logic for Service Category ('Contains') based on priority, edited final_data, created key
+-- 13 Dec 2023 :: Ruby Mohindru     :: added Customer Name mapping
+-- 14 Dec 2023 :: Ruby Mohindru     :: added Provider mapping
+-- 18 Jan 2024 :: Ruby Mohindru     :: edited provider_mapped for 'Clinic'
+*/
+
+ CREATE OR REPLACE TABLE dh_datachannel.t_driphydration_customer_analysis AS
+
+
+WITH customer_analysis AS
+
+(
+    /* Stripe HQ from combined */
+    SELECT 
+    'Stripe' AS data_flag, *
+    FROM `dh_datachannel.v_driphydration_stripe_payment_intents_daily`
+    WHERE account_type = 'HQ'
+    AND invoice_date >= '2023-03-01'
+  
+    UNION ALL 
+    /* Stripe partners from historical */
+    SELECT 
+    'Stripe' as data_flag, *
+    FROM `dh_datachannel.v_driphydration_stripe_other_accounts_historical` 
+    WHERE account_type = 'Partners'
+    AND invoice_date <= '2023-02-28'
+
+    UNION ALL 
+    /* Stripe partners from combined */
+    SELECT 
+    'Stripe' as data_flag, *
+    FROM `dh_datachannel.v_driphydration_stripe_payment_intents_daily` 
+    WHERE account_type = 'Partners'
+    AND invoice_date >= '2023-03-01'
+
+    UNION ALL 
+    /* Excel HQ data */
+    SELECT 'Excel' as data_flag,*
+    --,service_category AS service_category_mapped
+    FROM `dh_datachannel.v_driphydration_customer_analysis_historical`
+    WHERE invoice_date <= '2023-02-28'
+
+    UNION ALL 
+    /* Square data */
+    SELECT 'Square' as data_flag,* 
+    FROM (SELECT * FROM `dh_datachannel.v_driphydration_square_summary` UNION ALL
+          SELECT * FROM dh_datachannel.v_driphydration_square_excel_NY UNION ALL 
+          SELECT * FROM dh_datachannel.v_driphydration_square_excel_IE_AZ UNION ALL 
+          SELECT * FROM dh_datachannel.v_driphydration_square_excel_Baltimore UNION ALL 
+          SELECT * FROM dh_datachannel.v_driphydration_square_excel_Portland
+          )
+    --WHERE lower(service_category_mapped) NOT LIKE '%suppl%' OR  service_category_mapped IS NULL
+
+),
+
+cost_data AS
+(
+SELECT *,
+0.00 AS spend
+FROM customer_analysis
+
+UNION ALL 
+
+SELECT *
+FROM dh_datachannel.v_driphydration_costs
+),
+
+
+
+
+final_data AS(
+  SELECT 
+  data_flag
+  ,account_name
+  ,account_type
+  ,invoice_id
+  ,line_item_id
+  ,invoice_date
+  ,order_status
+  ,refund_flag
+  ,category
+  ,email
+  ,zip_code
+  ,phone_number
+  ,customer_city
+  ,customer_state
+  ,customer_id
+  ,customer_created_date
+  ,min_booking_date
+  ,min_valid_booking_date
+  ,min_valid_order_date
+  ,first_booking_product_id
+  ,first_booking_product_name
+  ,first_order_product_id
+  ,first_order_product_name
+  -- ,first_order_service_category
+  ,product_name
+  ,service_category
+  ,Treatment
+  ,source
+  ,Provider
+  ,currency
+  ,attempted
+  ,customer_name
+  ,CASE 
+    WHEN valid_order_flag = 1 AND 
+    DENSE_RANK() Over (Partition by lower(customer_id), valid_order_flag order by invoice_date asc) = 1 THEN 1 
+    ELSE 0 
+   END AS first_order_flag_new
+  ,covid_flag
+  ,valid_order_flag
+  ,valid_booking_flag
+  ,First_Order_Flag
+  ,Unique_Service_Flag
+  ,order_rank
+  ,booking_rank
+  ,service_Rank
+  ,customer_age
+  ,days_since_last_order
+  ,sum(line_item_quantity)line_item_quantity
+  ,sum(line_item_amount)line_item_amount
+  ,sum(tax)tax
+  ,sum(day30_revenue)day30_revenue
+  ,sum(day60_revenue)day60_revenue
+  ,sum(day90_revenue)day90_revenue
+  ,sum(day120_revenue)day120_revenue
+  ,sum(day180_revenue)day180_revenue
+  ,sum(refund_amt)refund_amt
+  ,sum(travel_fee)travel_fee
+  ,sum(tip)tip
+  ,sum(dispute_amt)dispute_amt
+  ,sum(spend)spend
+FROM
+  cost_data 
+WHERE
+  coalesce(email, 'unknown') NOT IN ('juliakiseleva@driphydration.com',
+'TESTER@test.com',
+'juliaworkinbox@gmail.com',
+'TESTER@mailinator.com',
+'steptest@mailinator.com',
+'maria18.stepanova@outlook.com',
+'katetest@mailinator.com',
+'1761178@mailinator.com',
+'test_noapplepay@mailinator.com',
+'qa@mailinator.com',
+'ergrgrgrt@mailinator.com',
+'nika.avdeenko@gmail.com',
+'juliaworkinbox124@gmail.com',
+'juliaworkinbox123@gmail.com',
+'kate@driphydration.com',
+'test@test.com',
+'jTESTER1234@mailinator.com',
+'testkate@mailinator.com',
+'trial2@mailinator.com',
+'93304@mailinator.com',
+'ksteptest@mailinator.com',
+'julia_prod_drip2@mailinator.com',
+'trial7@mailinator.com',
+'1761176@mailinator.com',
+'dehydration@mailinator.com',
+'Maria18.stepaniva@outlook.com',
+'natasha.sereda@driphydration.com',
+'nefremovski@gmail.com',
+'1761176@gmail.com',
+'jphinson@gmail.com',
+'wptestwork9@gmail.com',
+'ktest@mailinator.com',
+'yahooo@gmail.com',
+'maria18.stepanova@gmail.com',
+'yaloooo@yahoo.com',
+'1761176176@mailinator.com',
+'julia_prod_drip1@mailinator.com',
+'dina.chaevskaya.work@gmail.com',
+'novachromweb@gmail.com')
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,33,34,35,36,37,38,39,40,41,42
+),
+
+--select sum(line_item_amount) from final_data
+--270064
+--112053781.16999961
+
+mapping_data AS (
+  
+SELECT *
+, COALESCE(sc_inv_id,sc_inv_id_null,service_category_contains,'Unmapped')  AS service_category_final
+FROM
+(
+    SELECT *,ROW_NUMBER() OVER (PARTITION BY key ORDER BY priority_final) AS rn    
+    FROM 
+        (SELECT 
+        t.*
+        ,concat(
+                            ifnull(t.data_flag,'')
+                            ,ifnull(t.account_name,'')
+                            ,ifnull(t.account_type,'')
+                            ,ifnull(t.invoice_id,'')
+                            ,ifnull(line_item_id,'')
+                            ,ifnull(cast(t.invoice_date AS string),'')
+                            ,ifnull(order_status,'')
+                            ,ifnull(refund_flag,'')
+                            ,ifnull(category,'')
+                            ,ifnull(t.email,'')
+                            ,ifnull(zip_code,'')
+                            ,ifnull(phone_number,'')
+                            ,ifnull(customer_city,'')
+                            ,ifnull(customer_state,'')
+                            ,ifnull(t.customer_id,'')
+                            ,ifnull(cast(customer_created_date as string),'')
+                            ,ifnull(cast(min_booking_date as string),'')
+                            ,ifnull(cast(min_valid_booking_date as string),'')
+                            ,ifnull(cast(min_valid_order_date as string),'')
+                            ,ifnull(first_booking_product_id,'')
+                            ,ifnull(first_booking_product_name,'')
+                            ,ifnull(first_order_product_id,'')
+                            ,ifnull(first_order_product_name,'')
+                            --,ifnull(first_order_service_category,'')
+                            ,ifnull(product_name,'')
+                            ,ifnull(t.service_category,'')
+                            ,ifnull(Treatment,'')
+                            ,ifnull(source,'')
+                            ,ifnull(t.Provider,'')
+                            ,ifnull(currency,'')
+                            ,ifnull(cast(attempted as string),'')
+                            ,ifnull(t.customer_name,'')
+                            ,ifnull(cast(covid_flag as string),'')
+                            ,ifnull(cast(valid_order_flag as string),'')
+                            ,ifnull(cast(valid_booking_flag as string),'')
+                            ,ifnull(cast(First_Order_Flag as string),'')
+                            ,ifnull(cast(Unique_Service_Flag as string),'')
+                            ,ifnull(cast(order_rank as string),'')
+                            ,ifnull(cast(booking_rank as string),'')
+                            ,ifnull(cast(service_Rank as string),'')
+                            ,ifnull(cast(customer_age as string),'')
+                            ,ifnull(cast(days_since_last_order as string),'')
+                            ) as  key
+        ,b.final_service_category AS service_category_contains
+        ,COALESCE(CAST(b.priority AS int64),0) AS priority_final
+        ,d.final_service_category as sc_inv_id
+        ,e.final_service_category as sc_inv_id_null
+        --,COALESCE(m.provider,n.provider,t.Provider)AS provider_mapped
+        ,CASE 
+          WHEN lower(t.provider) like '%clinic%' THEN   
+          CONCAT('Clinic - ',(trim(case 
+                                      when lower(SPLIT(t.provider,'-') [SAFE_OFFSET(0)]) like '%clinic%' then INITCAP(SPLIT(t.provider,'-') [SAFE_OFFSET(1)]) 
+                                      when lower(SPLIT(t.provider,'-') [SAFE_OFFSET(1)]) like '%clinic%' then INITCAP(SPLIT((SPLIT(t.provider,'-') [SAFE_OFFSET(0)]),',') [SAFE_OFFSET(0)])
+                                  end)
+                              )
+                )     
+          WHEN t.provider = '3520' THEN 'Los Angeles'
+          WHEN t.provider = '3521' THEN 'San Diego'
+          WHEN t.provider = '3524' THEN 'San Francisco'
+          WHEN t.provider = '3641' THEN 'Austin'
+          WHEN t.provider = '3711' THEN 'Orange County'
+          WHEN t.provider = '5246' THEN 'Bakersfield'
+          WHEN t.provider = '82649' THEN 'Los Angeles'
+          --WHEN t.provider = 'aviva gelb' THEN 'Philadelphia'
+          WHEN t.provider = 'events' THEN 'Los Angeles'
+          WHEN t.provider in ('samantha noto','sharona avezova') THEN 'New York City'
+          WHEN t.account_name = 'Mobile Medical - Connecticut' THEN 'Connecticut'
+          WHEN t.account_name = 'Mobile Medical - Philadelphia' THEN 'Philadelphia'
+          WHEN t.account_name = 'Mobile Medical - Atlanta' THEN 'Atlanta'
+          WHEN t.account_name = 'Mobile Medical - Inland Empire' THEN 'Inland Empire'
+          WHEN t.account_name = 'Mobile Medical - New Orleans' THEN 'New Orleans'
+          WHEN t.account_name = 'Mobile Medical - Oklahoma' THEN 'Oklahoma City'
+          WHEN t.account_name = 'Mobile Medical - Pittsburgh' THEN 'Pittsburgh'
+          ELSE COALESCE(m.provider,n.provider,t.Provider) END AS provider_mapped
+        ,COALESCE(t.customer_name,cm.customer_name) as customer_name_final
+        FROM final_data t
+
+        -- SC Mapping
+            --  Manual Input
+              --invoice id not null
+                LEFT JOIN (select * from `dh_datachannel.gs_drip_hydration_service_category_mapping_sheet` where entry_type = '3_Manual Input' and invoice_id is not null) d
+                ON t.invoice_id = trim(d.invoice_id) AND
+                lower(t.service_category) = trim(lower(d.raw_service_category ))
+
+
+              --invoice id null customer_id null
+                LEFT JOIN (select * from `dh_datachannel.gs_drip_hydration_service_category_mapping_sheet` where entry_type = '3_Manual Input' and invoice_id is null and customer_id is null) e
+                ON lower(t.service_category) = lower(e.raw_service_category )
+              AND t.account_name = e.account_name
+
+            --Contains 
+              LEFT JOIN (select * from `dh_datachannel.gs_drip_hydration_service_category_mapping_sheet` where entry_type = '2_Contains') b 
+              ON TRIM(lower(t.service_category)) like CONCAT('%',trim(lower(b.raw_service_category)),'%')
+
+      -- CUSTOMER NAME MAPPING
+              LEFT JOIN trusty-hangar-396923.dh_datachannel.gs_drip_hydration_customer_name_mapping_sheet cm 
+              ON 
+              t.data_flag = cm.data_flag and
+              t.account_name = cm.account_name and 
+              t.invoice_id = cm.invoice_id          
+
+      -- PROVIDER MAPPING
+          --(invoice id not null)
+            LEFT JOIN 
+              (select * from (select *,ROW_NUMBER() OVER (PARTITION BY invoice_id order by invoice_date asc) as rn 
+            from trusty-hangar-396923.dh_datachannel.gs_drip_hydration_provider_mapping_sheet
+            where invoice_id is not null)where rn = 1 ) m
+            ON t.data_flag = trim(m.data_type) AND
+            t.account_name = trim(m.account_name) AND 
+            t.invoice_id = trim(m.invoice_id)  
+            --t.invoice_date = PARSE_DATE('%m/%d/%Y',m.invoice_date) 
+           
+
+            --(invoice id null)
+            LEFT JOIN 
+             (select * 
+             from trusty-hangar-396923.dh_datachannel.gs_drip_hydration_provider_mapping_sheet
+             where invoice_id is  null) n
+             ON t.data_flag = trim(n.data_type) AND
+            t.account_name = trim(n.account_name) AND 
+            t.service_category = trim(n.service_category_raw_) AND 
+            t.invoice_date = PARSE_DATE('%m/%d/%Y',n.invoice_date) AND 
+            t.email = n.email
+
+
+        
+
+
+        )
+)        
+WHERE rn = 1 
+)
+
+
+select *
+from mapping_data
+where service_category_final <> 'Exclude' and 
+(lower(ifnull(customer_name_final,'')) not like '%test%')

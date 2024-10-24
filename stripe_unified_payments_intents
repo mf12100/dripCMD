@@ -1,0 +1,870 @@
+SELECT
+  'Drip Hydration' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Arizona
+SELECT
+  'Drip Hydration Arizona' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__ariziona.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Atlanta
+SELECT
+  'Drip Hydration Atlanta' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  NULL AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__atlanta.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Austin
+SELECT
+  'Drip Hydration Austin' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__austin.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Baltimore
+SELECT
+  'Drip Hydration Baltimore' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  NULL AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__baltimore.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Colorado
+SELECT
+  'Drip Hydration Colorado' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  NULL AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__colorado.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Connecticut
+SELECT
+  'Drip Hydration Connecticut' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__connecticut.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Dallas
+SELECT
+  'Drip Hydration Dallas' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__dallas.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Hawaii
+SELECT
+  'Drip Hydration Hawaii' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__hawaii.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Houston
+SELECT
+  'Drip Hydration Houston' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__houston.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Illinois
+SELECT
+  'Drip Hydration Illinois' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__illinois.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Inland Empire
+SELECT
+  'Drip Hydration Inland Empire' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__inland_empire.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Kentucky
+SELECT
+  'Drip Hydration Kentucky' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__kentucky.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Las Vegas
+SELECT
+  'Drip Hydration Las Vegas' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__las_vegas.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Miami
+SELECT
+  'Drip Hydration Miami' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__miami.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Michigan
+SELECT
+  'Drip Hydration Michigan' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__michigan.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Minnesota
+SELECT
+  'Drip Hydration Minnesota' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__minnesota.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Missouri
+SELECT
+  'Drip Hydration Missouri' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__missouri.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration New Jersey
+SELECT
+  'Drip Hydration New Jersey' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__new_jersey_.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration New Mexico
+SELECT
+  'Drip Hydration New Mexico' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__new_mexico.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration New Orleans
+SELECT
+  'Drip Hydration New Orleans' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__new_orleans.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration New York
+SELECT
+  'Drip Hydration New York' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__new_york.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Ohio
+SELECT
+  'Drip Hydration Ohio' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__ohio.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Oklahoma
+SELECT
+  'Drip Hydration Oklahoma' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__oklahoma.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Philadelphia
+SELECT
+  'Drip Hydration Philadelphia' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__philadelphia.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Phoenix
+SELECT
+  'Drip Hydration Phoenix' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__phoenix.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Pittsburgh
+SELECT
+  'Drip Hydration Pittsburgh' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__pittsburgh.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Portland
+SELECT
+  'Drip Hydration Portland' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__portland.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Raleigh
+SELECT
+  'Drip Hydration Raleigh' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  NULL AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__raleigh.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Seattle
+SELECT
+  'Drip Hydration Seattle' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__seattle.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Tennessee
+SELECT
+  'Drip Hydration Tennessee' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__tennessee.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration UK
+SELECT
+  'Drip Hydration UK' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__uk.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Utah
+SELECT
+  'Drip Hydration Utah' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__utah.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Virginia
+SELECT
+  'Drip Hydration Virginia' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  NULL AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__virginia.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Washington DC
+SELECT
+  'Drip Hydration Washington DC' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  NULL AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__washington_dc.payment_intents`
+
+UNION ALL
+
+-- Drip Hydration Wisconsin
+SELECT
+  'Drip Hydration Wisconsin' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.drip_hydration__wisconsin.payment_intents`
+
+UNION ALL
+
+-- Mobile Medical
+SELECT
+  'Mobile Medical' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.mobile_medical_parent.payment_intents`
+
+UNION ALL
+
+-- Concierge MD LA
+SELECT
+  'Concierge MD LA' AS location,
+  id,
+  object,
+  created,
+  invoice,
+  currency,
+  CAST(amount AS FLOAT64) / 100 AS total_revenue,
+  metadata.email,
+  metadata.source,
+  metadata.treatment,
+  metadata.promo,
+  metadata.provider,
+  metadata.service_category, -- Added service_category
+  source AS source_field,
+  customer,
+  last_payment_error.code,
+  last_payment_error.type
+FROM `trusty-hangar-396923.concierge_md_la.payment_intents`

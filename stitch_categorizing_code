@@ -1,0 +1,702 @@
+WITH old_data AS (
+  SELECT 
+    CAST(invoice_date AS DATE) AS date, 
+    CASE 
+      WHEN LOWER(service_category_final) LIKE '%iv%' 
+           AND LOWER(service_category_final) NOT LIKE '%nad%' THEN 'Vitamin IV'
+      WHEN LOWER(service_category_final) LIKE '%nad%' THEN 'NAD'
+      ELSE service_category_final
+    END AS service,
+    CAST(SUM(line_item_amount - refund_amt) AS FLOAT64) AS revenue, 
+    COUNT(invoice_date) AS NumberOfOrders,
+    email,
+    CASE 
+      WHEN source LIKE "%CMD%" OR source LIKE "%Concierge%" THEN 'CMD'
+      WHEN source LIKE "%Drip%" OR source LIKE "%DH%" THEN 'Drip'
+      ELSE source
+    END AS final_source
+  FROM 
+    trusty-hangar-396923.dh_datachannel.t_driphydration_customer_analysis 
+  WHERE 
+    valid_order_flag = 1 
+    AND invoice_date < '2024-08-14'
+  GROUP BY 
+    invoice_date, service_category_final, email, final_source
+),
+
+new_data AS (
+  SELECT 
+    ili.date AS date,
+      CASE 
+        WHEN p.name IS NULL THEN 'Vitamin IV'  -- Assign "Vitamin IV" to NULL names
+        WHEN LOWER(p.name) LIKE '%iv%' OR p.name IN ('1L Normal Saline', 'Hangover IV', 'Recovery IV', 'Vitamin IV', 'Myers Cocktail IV', 'Immune Boost IV') THEN 'Vitamin IV'
+        WHEN LOWER(p.name) LIKE '%nad%' THEN 'NAD'
+        ELSE p.name
+      END AS service,
+    SUM(CAST(ili.amount AS FLOAT64) / 100) AS revenue,
+    COUNT(DISTINCT ili.invoice) AS NumberOfOrders,
+    COALESCE(NULLIF(ili.email, ""), "Unmapped") AS email,
+    CASE 
+      -- Attribute NULL source to CMD for concierge_md_la
+      WHEN ili.source IS NULL AND ili.table_source = 'concierge_md_la' THEN 'CMD'
+      -- Attribute NULL source to Drip for all other tables
+      WHEN ili.source IS NULL THEN 'Drip'
+      -- Attribute based on CMDLA
+      WHEN ili.source LIKE "%CMDLA%" THEN 'CMD'
+      -- Attribute based on DH
+      WHEN ili.source LIKE "%DH%" THEN 'Drip'
+      ELSE ili.source
+    END AS final_source
+  FROM (
+    -- Union queries for each Stripe table
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__ariziona' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__ariziona.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__atlanta' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__atlanta.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__austin' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__austin.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__baltimore' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__baltimore.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__colorado' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__colorado.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__connecticut' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__connecticut.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__dallas' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__dallas.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__hawaii' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__hawaii.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__houston' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__houston.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__illinois' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__illinois.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__inland_empire' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__inland_empire.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__kentucky' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__kentucky.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__las_vegas' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__las_vegas.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__miami' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__miami.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__michigan' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__michigan.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__minnesota' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__minnesota.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__missouri' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__missouri.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__new_jersey_' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__new_jersey_.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__new_mexico' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__new_mexico.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__new_orleans' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__new_orleans.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__new_york' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__new_york.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__ohio' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__ohio.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__oklahoma' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__oklahoma.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__philadelphia' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__philadelphia.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__phoenix' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__phoenix.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__pittsburgh' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__pittsburgh.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__portland' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__portland.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__raleigh' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__raleigh.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__seattle' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__seattle.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__tennessee' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__tennessee.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__uk' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__uk.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__utah' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__utah.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__virginia' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__virginia.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__washington_dc' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__washington_dc.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'drip_hydration__wisconsin' AS table_source
+    FROM trusty-hangar-396923.drip_hydration__wisconsin.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'mobile_medical_parent' AS table_source
+    FROM trusty-hangar-396923.mobile_medical_parent.invoice_line_items
+    UNION ALL
+    SELECT 
+      DATE(_sdc_received_at) AS date, 
+      amount, 
+      SAFE_CAST(price.product AS STRING) AS product, 
+      invoice,
+      metadata.email AS email,
+      metadata.source AS source,
+      'concierge_md_la' AS table_source
+    FROM trusty-hangar-396923.concierge_md_la.invoice_line_items
+  ) AS ili
+  LEFT JOIN (
+    SELECT id, name
+    FROM (
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__ariziona.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__atlanta.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__austin.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__baltimore.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__colorado.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__connecticut.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__dallas.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__hawaii.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__houston.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__illinois.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__inland_empire.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__kentucky.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__las_vegas.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__miami.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__michigan.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__minnesota.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__missouri.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__new_jersey_.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__new_mexico.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__new_orleans.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__new_york.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__ohio.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__oklahoma.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__philadelphia.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__phoenix.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__pittsburgh.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__portland.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__raleigh.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__seattle.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__tennessee.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__uk.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__utah.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__virginia.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__washington_dc.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.drip_hydration__wisconsin.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.mobile_medical_parent.products
+      UNION ALL
+      SELECT id, name FROM trusty-hangar-396923.concierge_md_la.products
+    )
+  ) AS p 
+  ON ili.product = p.id
+  WHERE ili.date >= '2024-08-14'
+  GROUP BY 
+    date, service, email, final_source
+),
+
+square_data AS (
+  SELECT 
+    CASE 
+  WHEN line_item.value.name IS NULL THEN 'Vitamin IV'  -- Assign "Vitamin IV" to NULL names
+  WHEN LOWER(line_item.value.name) LIKE '%iv%' OR line_item.value.name IN ('1L Normal Saline', 'Hangover IV', 'Recovery IV', 'Vitamin IV', 'Myers Cocktail IV', 'Immune Boost IV') THEN 'Vitamin IV'
+  ELSE line_item.value.name
+END AS service,
+    ROUND(SUM(line_item.value.total_money.amount) / 100, 2) AS revenue,
+    DATE(updated_at) AS date,
+    COUNT(updated_at) AS NumberOfOrders,
+    "Unmapped" AS email,
+    "Drip" AS final_source  -- Attribute everything to "Drip"
+  FROM 
+    `trusty-hangar-396923.square_seattle.orders`, 
+    UNNEST(line_items) AS line_item
+  WHERE 
+    updated_at >= '2024-08-14'
+  GROUP BY 
+    service, DATE(updated_at)
+
+  UNION ALL
+
+  SELECT 
+    CASE 
+      WHEN LOWER(line_item.value.name) LIKE '%iv%' 
+           OR line_item.value.name IN ('1L Normal Saline', 'Hangover IV', 'Recovery IV', 'Vitamin IV', 'Myers Cocktail IV', 'Immune Boost IV') THEN 'Vitamin IV'
+      ELSE line_item.value.name
+    END AS service,
+    ROUND(SUM(line_item.value.total_money.amount) / 100, 2) AS revenue,
+    DATE(updated_at) AS date,
+    COUNT(updated_at) AS NumberOfOrders,
+    "Unmapped" AS email,
+    "Drip" AS final_source  -- Attribute everything to "Drip"
+  FROM 
+    `trusty-hangar-396923.square_baltimore.orders`, 
+    UNNEST(line_items) AS line_item
+  WHERE 
+    updated_at >= '2024-08-14'
+  GROUP BY 
+    service, DATE(updated_at)
+
+  UNION ALL
+
+  SELECT 
+    CASE 
+      WHEN LOWER(line_item.value.name) LIKE '%iv%' 
+           OR line_item.value.name IN ('1L Normal Saline', 'Hangover IV', 'Recovery IV', 'Vitamin IV', 'Myers Cocktail IV', 'Immune Boost IV') THEN 'Vitamin IV'
+      ELSE line_item.value.name
+    END AS service,
+    ROUND(SUM(line_item.value.total_money.amount) / 100, 2) AS revenue,
+    DATE(updated_at) AS date,
+    COUNT(updated_at) AS NumberOfOrders,
+    "Unmapped" AS email,
+    "Drip" AS final_source  -- Attribute everything to "Drip"
+  FROM 
+    `trusty-hangar-396923.square_atlanta.orders`, 
+    UNNEST(line_items) AS line_item
+  WHERE 
+    updated_at >= '2024-08-14'
+  GROUP BY 
+    service, DATE(updated_at)
+
+  UNION ALL
+
+  SELECT 
+    CASE 
+      WHEN LOWER(line_item.value.name) LIKE '%iv%' 
+           OR line_item.value.name IN ('1L Normal Saline', 'Hangover IV', 'Recovery IV', 'Vitamin IV', 'Myers Cocktail IV', 'Immune Boost IV') THEN 'Vitamin IV'
+      ELSE line_item.value.name
+    END AS service,
+    ROUND(SUM(line_item.value.total_money.amount) / 100, 2) AS revenue,
+    DATE(updated_at) AS date,
+    COUNT(updated_at) AS NumberOfOrders,
+    "Unmapped" AS email,
+    "Drip" AS final_source  -- Attribute everything to "Drip"
+  FROM 
+    `trusty-hangar-396923.square__nc.orders`, 
+    UNNEST(line_items) AS line_item
+  WHERE 
+    updated_at >= '2024-08-14'
+  GROUP BY 
+    service, DATE(updated_at)
+
+  UNION ALL
+
+  SELECT 
+    CASE 
+      WHEN LOWER(line_item.value.name) LIKE '%iv%' 
+           OR line_item.value.name IN ('1L Normal Saline', 'Hangover IV', 'Recovery IV', 'Vitamin IV', 'Myers Cocktail IV', 'Immune Boost IV') THEN 'Vitamin IV'
+      ELSE line_item.value.name
+    END AS service,
+    ROUND(SUM(line_item.value.total_money.amount) / 100, 2) AS revenue,
+    DATE(updated_at) AS date,
+    COUNT(updated_at) AS NumberOfOrders,
+    "Unmapped" AS email,
+    "Drip" AS final_source  -- Attribute everything to "Drip"
+  FROM 
+    `trusty-hangar-396923.square__miami.orders`, 
+    UNNEST(line_items) AS line_item
+  WHERE 
+    updated_at >= '2024-08-14'
+  GROUP BY 
+    service, DATE(updated_at)
+)
+
+SELECT 
+  date, 
+  CASE 
+    -- CMD Membership filter remains
+    WHEN (LOWER(final_source) LIKE '%cmd%' OR LOWER(service) LIKE '%membership%' OR LOWER(service) LIKE '%monthly membership%') THEN 'CMD Membership'
+
+    -- Group NAD products as NAD Injections
+    WHEN LOWER(service) LIKE '%nad%' THEN 'NAD'
+    
+    -- Group Virtual Consultations
+    WHEN LOWER(service) LIKE '%virtual consultation%' THEN 'Virtual Consultation'
+    
+    -- Group Weight Loss services
+    WHEN LOWER(service) LIKE '%weight%' THEN 'Weight Loss'
+    
+    -- Group anything with "tip" as Tips
+    WHEN LOWER(service) LIKE '%tip%' THEN 'Tips'
+    
+    -- Group Add-ons and Extra services into Vitamin IV
+    WHEN LOWER(service) LIKE '%add-on%' OR LOWER(service) LIKE '%add on%' OR LOWER(service) LIKE '%extra%' THEN 'Vitamin IV'
+    
+    -- Group Vitamins into "Vitamin IV"
+    WHEN LOWER(service) LIKE '%b12%' OR LOWER(service) LIKE '%vitamin%' OR LOWER(service) LIKE '%b-complex%' OR LOWER(service) LIKE '%biotin%' 
+         OR LOWER(service) LIKE '%glutathione%' OR LOWER(service) LIKE '%vitamin d%' OR LOWER(service) LIKE '%anti nausea%' 
+         OR LOWER(service) LIKE '%anti-nausea%' OR LOWER(service) LIKE '%anti-inflammatory%' OR LOWER(service) LIKE '%energy boost%' THEN 'Vitamin IV'
+    
+    -- Group Peptides
+    WHEN LOWER(service) LIKE '%peptide%' OR LOWER(service) LIKE '%bpc%' OR LOWER(service) LIKE '%sermorelin%' THEN 'Peptides'
+    
+    -- Group Myer's Cocktail / Myers Cocktail into just Myers Cocktail
+    WHEN LOWER(service) LIKE '%myers%' OR LOWER(service) LIKE '%myer%' THEN 'Myers Cocktail'
+    
+    -- Group Enclomiphene
+    WHEN LOWER(service) LIKE '%enclomiphene%' THEN 'Enclomiphene'
+    
+    -- Group TRT
+    WHEN LOWER(service) LIKE '%trt%' THEN 'TRT'
+    
+    -- Group Famotidine (Pepcid) and Pepcid into Pepcid
+    WHEN LOWER(service) LIKE '%pepcid%' OR LOWER(service) LIKE '%famotidine%' THEN 'Pepcid'
+    
+    -- Group Lipostat
+    WHEN LOWER(service) LIKE '%lipostat%' THEN 'Peptides'
+    
+    -- Group Ketorolac / Toradol into just Ketorolac
+    WHEN LOWER(service) LIKE '%toradol%' OR LOWER(service) LIKE '%ketorolac%' THEN 'Ketorolac'
+    
+    -- Group Glutathione into Vitamin IV
+    WHEN LOWER(service) LIKE '%glutathione%' THEN 'Vitamin IV'
+    
+    -- Group Corporate services
+    WHEN LOWER(service) LIKE '%corporate%' THEN 'Corporate'
+    
+    -- Group Cosmetic Treatment services
+    WHEN LOWER(service) LIKE '%cosmetic%' THEN 'Cosmetic Treatment'
+    
+    -- Group Covid services
+    WHEN LOWER(service) LIKE '%covid%' THEN 'Covid'
+    
+    -- Group House Calls services
+    WHEN LOWER(service) LIKE '%house call%' THEN 'House Calls'
+    
+    -- Group Hair Loss services
+    WHEN LOWER(service) LIKE '%hair%' THEN 'Hair Loss'
+    
+    -- Group Zinc into Vitamin IV
+    WHEN LOWER(service) LIKE '%zinc%' THEN 'Vitamin IV'
+    
+    -- Group Lab Draw, Lab Test, Labs into Lab Tests
+    WHEN LOWER(service) LIKE '%lab draw%' OR LOWER(service) LIKE '%lab test%' OR LOWER(service) LIKE '%labs%' THEN 'Lab Tests'
+    
+    -- Group Service Charge and Service Fee into Other
+    WHEN LOWER(service) LIKE '%service charge%' OR LOWER(service) LIKE '%service fee%' THEN 'Other'
+    
+    -- Group unmatched services into "Unmapped"
+    ELSE 'Unmapped'
+  END AS service,
+  COALESCE(email, "Unmapped") AS email,
+  final_source,
+  SUM(revenue) AS total_revenue,
+  SUM(NumberOfOrders) AS total_orders
+FROM (
+  SELECT date, service, COALESCE(email, "Unmapped") AS email, final_source, revenue, NumberOfOrders FROM old_data
+  UNION ALL
+  SELECT date, service, COALESCE(email, "Unmapped") AS email, final_source, revenue, NumberOfOrders FROM new_data
+  UNION ALL
+  SELECT date, service, COALESCE(email, "Unmapped") AS email, final_source, revenue, NumberOfOrders FROM square_data
+)
+GROUP BY 
+  date, service, email, final_source
+ORDER BY 
+  date DESC;

@@ -1,0 +1,171 @@
+WITH RankedInvoices AS (
+    SELECT
+        customer_id,
+        service_category,
+        line_item_amount,
+        invoice_date,
+        data_flag,
+        ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY invoice_date) AS rank
+    FROM trusty-hangar-396923.dh_datachannel.t_driphydration_customer_analysis
+    WHERE valid_order_flag = 1 AND refund_flag = 'Non Refund'
+),
+
+FirstServiceCategory AS (
+    SELECT
+        customer_id,
+        invoice_date,
+        CASE 
+            WHEN data_flag IN ('Stripe', 'Square', 'Excel') THEN 
+                CASE 
+                    WHEN LOWER(service_category) LIKE '%vitamin%' AND (LOWER(service_category) LIKE '%injection%' OR LOWER(service_category) LIKE '%shot%') THEN 'Vitamin Injection'
+                    WHEN LOWER(service_category) LIKE '%iron iv%' THEN 'Iron IV'
+                    WHEN LOWER(service_category) LIKE '%iv membership%' THEN 'IV Membership Plan'
+                    WHEN LOWER(service_category) LIKE '%iv therapy%' OR LOWER(service_category) LIKE '%iv treatment%' OR LOWER(service_category) LIKE '%vitamin%' THEN 'IV Therapy'
+                    WHEN LOWER(service_category) LIKE '%vaccine%' THEN 'Vaccine'
+                    WHEN LOWER(service_category) LIKE '%consulting%' OR LOWER(service_category) LIKE '%telemed%' OR LOWER(service_category) LIKE '%virtual%' THEN 'Virtual Consultation'
+                    WHEN LOWER(service_category) LIKE '%nad%' AND LOWER(service_category) LIKE '%membership%' THEN 'NAD Membership'
+                    WHEN LOWER(service_category) LIKE '%nad injection%' OR LOWER(service_category) LIKE '%nad shot%' THEN 'NAD Injection'
+                    WHEN LOWER(service_category) LIKE '%monoclonal%' THEN 'Monoclonal'
+                    WHEN LOWER(service_category) LIKE '%nad nasal spray%' OR LOWER(service_category) LIKE '%nasal nad spray%' THEN 'NAD Nasal Spray'
+                    WHEN LOWER(service_category) LIKE '%nad%' THEN 'NAD IV'
+                    WHEN LOWER(service_category) LIKE '%covid%' OR LOWER(service_category) LIKE '%antigen%' OR LOWER(service_category) LIKE '%pcr%' THEN 'Covid'
+                    WHEN LOWER(service_category) = ' iv ' OR LOWER(service_category) LIKE '%ivs%' THEN 'IV Therapy'
+                    WHEN LOWER(service_category) LIKE '%ketamine%' OR LOWER(service_category) LIKE '%mental health iv%' OR LOWER(service_category) LIKE '%specialty%' THEN 'Ketamine IV'
+                    WHEN LOWER(service_category) LIKE '%stem cell%' THEN 'Stem Cell IV'
+                    WHEN LOWER(service_category) LIKE '%test%' THEN 'Lab Testing'
+                    WHEN LOWER(service_category) LIKE '%peptide%' THEN 'Peptides'
+                    WHEN LOWER(service_category) LIKE '%weight%' THEN 'Weight Loss'
+                    WHEN LOWER(service_category) LIKE '%trt%' OR LOWER(service_category) LIKE '%enclomiphene%' THEN 'TRT'
+                    WHEN LOWER(service_category) LIKE '%imaging%' THEN 'Imaging'
+                    WHEN LOWER(service_category) LIKE '%house call%' THEN 'House Calls'
+                    WHEN LOWER(service_category) LIKE '%evusheld%' THEN 'Evusheld'
+                    WHEN LOWER(service_category) LIKE '%lab draw%' OR LOWER(service_category) LIKE '%blood draw%' THEN 'Lab Draw'
+                    WHEN LOWER(service_category) LIKE '%hair loss%' THEN 'Hair Loss Treatment'
+                    WHEN LOWER(service_category) LIKE '%corporate%' THEN 'Corporate'
+                    WHEN LOWER(service_category) LIKE '%cmd%' THEN 'CMD Membership'
+                    WHEN LOWER(service_category) LIKE '%events%' THEN 'Events'
+                    WHEN LOWER(service_category) LIKE '%cosmetic%' THEN 'Cosmetics'
+                    WHEN LOWER(service_category) LIKE '%diagnostic scan%' THEN 'Diagnostic Scan'
+                    ELSE 'Unmapped'
+                END
+            ELSE 
+                CASE 
+                    WHEN LOWER(service_category) LIKE '%vitamin%' AND (LOWER(service_category) LIKE '%injection%' OR LOWER(service_category) LIKE '%shot%') THEN 'Vitamin Injection'
+                    WHEN service_category = 'IV' OR LOWER(service_category) LIKE '%vitamin%' THEN 'IV Therapy'
+                    ELSE service_category 
+                END
+        END AS First_Service_Category
+    FROM RankedInvoices
+    WHERE rank = 1
+),
+
+ClassifiedInvoices AS (
+    SELECT 
+        invoice_date,
+        line_item_amount,
+        CASE
+            WHEN account_name LIKE "%Drip%" OR account_name LIKE "%Mobile Medical%" THEN 'Drip'
+            ELSE 'CMD'
+        END AS Account
+    FROM trusty-hangar-396923.dh_datachannel.t_driphydration_customer_analysis
+    WHERE valid_order_flag = 1 AND refund_flag = 'Non Refund'
+),
+
+Revenue AS (
+    SELECT 
+        invoice_date AS Date,
+        SUM(line_item_amount) AS Revenue,
+        COUNT(*) AS NumberOfOrders,
+        Account
+    FROM ClassifiedInvoices
+    GROUP BY 
+        invoice_date, 
+        Account
+),
+
+ServiceRevenue AS (
+    SELECT
+        fsc.invoice_date,
+        fsc.First_Service_Category,
+        SUM(ri.line_item_amount) AS Category_Revenue
+    FROM RankedInvoices ri
+    JOIN FirstServiceCategory fsc ON ri.customer_id = fsc.customer_id AND ri.invoice_date = fsc.invoice_date
+    GROUP BY fsc.invoice_date, fsc.First_Service_Category
+),
+
+AdSpend AS (
+    SELECT 
+        date_start AS Date,
+        SUM(spend) AS TotalSpend,
+        'Facebook' AS Platform,
+        'Drip' AS Account
+    FROM trusty-hangar-396923.dh_datachannel.fb2_driphydration_fb_ad_performance
+    GROUP BY date_start
+
+    UNION ALL
+
+    SELECT 
+        date AS Date,
+        SUM(cost_micros/1000000) AS TotalSpend,
+        'Google' AS Platform,
+        'Drip' AS Account
+    FROM trusty-hangar-396923.dh_datachannel.gads_driphydration_gads_ad_performance
+    GROUP BY date
+
+    UNION ALL
+
+    SELECT 
+        date_start AS Date,
+        SUM(spend) AS TotalSpend,
+        'Facebook' AS Platform,
+        'CMD' AS Account
+    FROM trusty-hangar-396923.dh_datachannel.fb2_driphydration_cmd_fb_ad_performance
+    GROUP BY date_start
+
+    UNION ALL
+
+    SELECT 
+        date AS Date,
+        SUM(cost_micros/1000000) AS TotalSpend,
+        'Google' AS Platform,
+        'CMD' AS Account
+    FROM trusty-hangar-396923.dh_datachannel.gads_driphydration_cmd_gads_ad_performance
+    GROUP BY date
+),
+
+CombinedAdSpend AS (
+    SELECT 
+        Date, 
+        Account, 
+        SUM(CASE WHEN Platform = 'Facebook' THEN TotalSpend ELSE 0 END) AS TotalFacebookSpend,
+        SUM(CASE WHEN Platform = 'Google' THEN TotalSpend ELSE 0 END) AS TotalGoogleSpend
+    FROM AdSpend
+    GROUP BY Date, Account
+),
+
+CombinedData AS (
+    SELECT
+        r.Date,
+        r.Account,
+        COALESCE(r.Revenue, 0) AS Revenue,
+        r.NumberOfOrders,
+        COALESCE(c.TotalFacebookSpend, 0) AS TotalFacebookSpend,
+        COALESCE(c.TotalGoogleSpend, 0) AS TotalGoogleSpend,
+        s.First_Service_Category,
+        s.Category_Revenue
+    FROM Revenue r
+    LEFT JOIN CombinedAdSpend c ON r.Date = c.Date AND r.Account = c.Account
+    LEFT JOIN ServiceRevenue s ON r.Date = s.invoice_date
+)
+
+SELECT
+    Date,
+    Account,
+    NumberOfOrders,
+    First_Service_Category,
+    Category_Revenue,
+    Revenue,
+    TotalFacebookSpend,
+    TotalGoogleSpend
+FROM CombinedData
+ORDER BY Date, Account, First_Service_Category;
